@@ -43,6 +43,14 @@ FORTIFY_NAMES = ['cpy_chk', 'printf_chk', 'cat_chk', 'poll_chk',
                  '__realpath_chk', '__explicit_bzero_chk', '__recv_chk',
                  '__getdomainname_chk', '__gethostname_chk']
 
+# road only data sections. This should be expanded.
+RODATA_SECTIONS = ['.rodata', '.rodata.str1.1', '.rodata.str1.4',
+                   '.rodata.str1.8', '.rodata.cst4', '.rodata.cst8',
+                   '.rodata.cst16', 'rodata']
+
+# sections with interesting data found in guile programs
+GUILE_STRTAB_SECTIONS = ['.guile.arities.strtab', '.guile.docstrs.strtab']
+
 class ElfUnpackParser(UnpackParser):
     extensions = []
     signatures = [
@@ -78,8 +86,50 @@ class ElfUnpackParser(UnpackParser):
                 if header.type == elf.Elf.ShType.note:
                     for entry in header.body.entries:
                         pass
+                elif header.type == elf.Elf.ShType.strtab:
+                    for entry in header.body.entries:
+                        pass
+
                 # force read the header name
                 name = header.name
+                if header.type == elf.Elf.ShType.symtab:
+                    if header.name == '.symtab':
+                        for entry in header.body.entries:
+                            name = entry.name
+                if header.type == elf.Elf.ShType.dynamic:
+                    if header.name == '.dynamic':
+                        for entry in header.body.entries:
+                            if entry.tag_enum == elf.Elf.DynamicArrayTags.needed:
+                                name = entry.value_str
+                            elif entry.tag_enum == elf.Elf.DynamicArrayTags.rpath:
+                                name = entry.value_str
+                            elif entry.tag_enum == elf.Elf.DynamicArrayTags.runpath:
+                                name = entry.value_str
+                            elif entry.tag_enum == elf.Elf.DynamicArrayTags.soname:
+                                name = entry.value_str
+
+                elif header.type == elf.Elf.ShType.symtab:
+                    if header.name == '.symtab':
+                        for entry in header.body.entries:
+                            name = entry.name
+                            name = entry.type.name
+                            name = entry.bind.name
+                            name = entry.visibility.name
+                            name = entry.sh_idx
+                            name = entry.size
+                elif header.type == elf.Elf.ShType.dynsym:
+                    if header.name == '.dynsym':
+                        for entry in header.body.entries:
+                            name = entry.name
+                            name = entry.type.name
+                            name = entry.bind.name
+                            name = entry.visibility.name
+                            name = entry.sh_idx
+                            name = entry.size
+                elif header.type == elf.Elf.ShType.progbits:
+                    if header.name in RODATA_SECTIONS:
+                        body = header.body
+
             # read the names, but don't proces them. This is just to force
             # evaluation, which normally happens lazily for instances in
             # kaitai struct.
@@ -198,6 +248,9 @@ class ElfUnpackParser(UnpackParser):
         # store dynamic symbols (empty for statically linked binaries)
         dynamic_symbols = []
 
+        # guile symbols (empty for non-Guile programs)
+        guile_symbols = []
+
         # store information about notes
         notes = []
 
@@ -214,11 +267,6 @@ class ElfUnpackParser(UnpackParser):
 
         # module name (for Linux kernel modules)
         self.module_name = ''
-
-        # only look at a few interesting sections. This should be expanded.
-        rodata_sections = ['.rodata', '.rodata.str1.1', '.rodata.str1.4',
-                           '.rodata.str1.8', '.rodata.cst4', '.rodata.cst8',
-                           '.rodata.cst16', 'rodata']
 
         # process the various section headers
         is_dynamic_elf = False
@@ -277,7 +325,7 @@ class ElfUnpackParser(UnpackParser):
                 if header.name == '.symtab':
                     for entry in header.body.entries:
                         symbol = {}
-                        if entry.name == None:
+                        if entry.name is None:
                             symbol['name'] = ''
                         else:
                             symbol['name'] = entry.name
@@ -291,7 +339,7 @@ class ElfUnpackParser(UnpackParser):
                 if header.name == '.dynsym':
                     for entry in header.body.entries:
                         symbol = {}
-                        if entry.name == None:
+                        if entry.name is None:
                             symbol['name'] = ''
                         else:
                             symbol['name'] = entry.name
@@ -338,7 +386,7 @@ class ElfUnpackParser(UnpackParser):
                     link_name = header.body.split(b'\x00', 1)[0].decode()
                     link_crc = header.body[-4:]
                     metadata['gnu debuglink'] = link_name
-                elif header.name in rodata_sections:
+                elif header.name in RODATA_SECTIONS:
                     for s in header.body.split(b'\x00'):
                         try:
                             decoded_strings = s.decode().splitlines()
@@ -403,13 +451,18 @@ class ElfUnpackParser(UnpackParser):
                     pass
                 elif header.name == '.rol4re_elf_aux':
                     labels.append('l4')
+
             if header.type == elf.Elf.ShType.dynamic:
                 is_dynamic_elf = True
                 for entry in header.body.entries:
                     pass
             elif header.type == elf.Elf.ShType.strtab:
-                for entry in header.body.entries:
-                    pass
+                if header.name in GUILE_STRTAB_SECTIONS:
+                    for entry in header.body.entries:
+                        pass
+                else:
+                    for entry in header.body.entries:
+                        pass
             elif header.type == elf.Elf.ShType.dynsym:
                 for entry in header.body.entries:
                     pass
@@ -473,6 +526,7 @@ class ElfUnpackParser(UnpackParser):
                             pass
                     elif entry.name == b'FDO' and entry.type == 0xcafe1a7e:
                         # https://fedoraproject.org/wiki/Changes/Package_information_on_ELF_objects
+                        # https://systemd.io/COREDUMP_PACKAGE_METADATA/
                         # extract JSON and store it
                         try:
                             metadata['package note'] = json.loads(entry.descriptor.decode().split('\x00')[0].strip())
@@ -494,8 +548,11 @@ class ElfUnpackParser(UnpackParser):
                         # .note.Xen in FreeBSD kernel
                         # .notes in Linux kernel)
                         labels.append('xen')
+                    elif entry.name == b'NaCl':
+                        labels.append('Google Native Client')
 
         metadata['dynamic_symbols'] = dynamic_symbols
+        metadata['guile_symbols'] = guile_symbols
         metadata['needed'] = needed
         metadata['notes'] = notes
         metadata['rpath'] = rpath

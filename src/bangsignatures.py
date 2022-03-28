@@ -25,7 +25,6 @@
 import math
 
 import bangfilesystems
-import bangmedia
 import bangunpack
 
 # store a few standard signatures
@@ -171,7 +170,6 @@ signatures = {
 
 # some signatures do not start at the beginning of the file
 signaturesoffset = {
-    'webp': 8,
     'wav': 8,
     'ani': 8,
     'tar_posix': 0x101,
@@ -215,73 +213,15 @@ signaturesoffset = {
 
 # keep a list of signatures to the (built in) functions
 signaturetofunction = {
-    'webp': bangmedia.unpack_webp,
-    'ani': bangmedia.unpack_ani,
-    'mng': bangmedia.unpack_mng,
-    'gzip': bangunpack.unpack_gzip,
-    'xz': bangunpack.unpack_xz,
-    'lzma_var1': bangunpack.unpack_lzma,
-    'lzma_var2': bangunpack.unpack_lzma,
-    'lzma_var3': bangunpack.unpack_lzma,
-    'tar_posix': bangunpack.unpack_tar,
-    'tar_gnu': bangunpack.unpack_tar,
-    'ar': bangunpack.unpack_ar,
-    'squashfs_var1': bangfilesystems.unpack_squashfs,
-    'squashfs_var2': bangfilesystems.unpack_squashfs,
-    'squashfs_var3': bangfilesystems.unpack_squashfs,
-    'squashfs_var4': bangfilesystems.unpack_squashfs,
-    'squashfs_var5': bangfilesystems.unpack_squashfs,
-    'squashfs_var6': bangfilesystems.unpack_squashfs,
-    'squashfs_var7': bangfilesystems.unpack_squashfs,
-    'icc': bangunpack.unpack_icc,
+    'ani': bangunpack.unpack_ani,
+    'mng': bangunpack.unpack_mng,
     'zip': bangunpack.unpack_zip,
     'dahua': bangunpack.unpack_dahua,
     'xar': bangunpack.unpack_xar,
     'iso9660': bangfilesystems.unpack_iso9660,
-    'lzip': bangunpack.unpack_lzip,
-    'jpeg': bangmedia.unpack_jpeg,
-    'opentype': bangunpack.unpack_opentype_font,
-    'ttc': bangunpack.unpack_opentype_font_collection,
-    'truetype': bangunpack.unpack_truetype_font,
-    'android_backup': bangunpack.unpack_android_backup,
-    'sgi': bangmedia.unpack_sgi,
-    'aiff': bangmedia.unpack_aiff,
-    'rzip': bangunpack.unpack_rzip,
-    'jffs2_little_endian': bangfilesystems.unpack_jffs2,
-    'jffs2_big_endian': bangfilesystems.unpack_jffs2,
-    'mswim': bangunpack.unpack_wim,
-    'sunraster': bangmedia.unpack_sunraster,
     'ext2': bangfilesystems.unpack_ext2,
-    'zstd_08': bangunpack.unpack_zstd,
-    'vmdk': bangfilesystems.unpack_vmdk,
-    'qcow2': bangfilesystems.unpack_qcow2,
-    'swf': bangmedia.unpack_swf,
-    'swf_zlib': bangmedia.unpack_swf,
-    'swf_lzma': bangmedia.unpack_swf,
-    'certificate': bangunpack.unpack_certificate,
-    'flv': bangmedia.unpack_flv,
-    'pdf': bangmedia.unpack_pdf,
-    'pack200': bangunpack.unpack_pack200,
-    'zim': bangunpack.unpack_zim,
-    'sqlite3': bangunpack.unpack_sqlite,
-    'trx': bangunpack.unpack_trx,
-    'ppm': bangmedia.unpack_pnm,
-    'pgm': bangmedia.unpack_pnm,
-    'pbm': bangmedia.unpack_pnm,
-    'fat': bangfilesystems.unpack_fat,
-    'cbfs': bangfilesystems.unpack_cbfs,
-    'compress': bangunpack.unpack_compress,
+    'pdf': bangunpack.unpack_pdf,
     'romfs': bangfilesystems.unpack_romfs,
-    'cramfs_le': bangfilesystems.unpack_cramfs,
-    'cramfs_be': bangfilesystems.unpack_cramfs,
-    'bflt': bangunpack.unpack_bflt,
-    'ubi': bangfilesystems.unpack_ubi,
-    'pcapng': bangunpack.unpack_pcapng,
-    'pcap_le': bangunpack.unpack_pcap,
-    'pcap_be': bangunpack.unpack_pcap,
-    'pcap_le_nano': bangunpack.unpack_pcap,
-    'pcap_be_nano': bangunpack.unpack_pcap,
-    'plf': bangfilesystems.unpack_plf,
 }
 
 # a lookup table to map signatures to a name for
@@ -332,9 +272,6 @@ signatureprettyprint = {
 # These extensions should be lower case
 extensiontofunction = {
     '.new.dat': bangunpack.unpack_android_sparse_data,
-    '.tar': bangunpack.unpack_tar,
-    '.rsa': bangunpack.unpack_certificate,
-    '.pem': bangunpack.unpack_certificate,
 }
 
 import os
@@ -579,23 +516,6 @@ def prescan_bmp(scanbytes, bytesread, filesize, offset, offsetinfile):
             return False
     return True
 
-def prescan_sgi(scanbytes, bytesread, filesize, offset, offsetinfile):
-    # header of SGI files is 512 bytes
-    if filesize - (offset + offsetinfile) < 512:
-        return False
-    if bytesread - offset > 512:
-        # storage format
-        if not (scanbytes[offset+2] == 0 or scanbytes[offset+2] == 1):
-            return False
-        # BPC
-        if not (scanbytes[offset+3] == 1 or scanbytes[offset+3] == 2):
-            return False
-        # dummy values, last 404 bytes of
-        # the header are 0x00
-        if not scanbytes[offset+108:offset+512] == b'\x00' * 404:
-            return False
-    return True
-
 def prescan_ico(scanbytes, bytesread, filesize, offset, offsetinfile):
     # check the number of images
     if filesize - (offset + offsetinfile) < 22:
@@ -680,7 +600,6 @@ prescan_functions = {
     'bzip2': prescan_bzip2,
     'gzip': prescan_gzip,
     'bmp' : prescan_bmp,
-    'sgi' : prescan_sgi,
     'ico' : prescan_ico,
     'png' : prescan_png,
     'mng' : prescan_mng,
