@@ -1,16 +1,15 @@
-# Configuration of the Elasticsearch reporter in BANG
+# Configuration of the ElasticSearch/Opensearch reporter in BANG
 
-BANG can write its results to Elasticsearch and make it available for further
-investigation and processing using standard Elasticsearch tools.
+BANG can write its results to ElasticSearch/OpenSearch and make it available for further
+investigation and processing using standard ElasticSearch/OpenSearch tools.
 
 Note: these are mostly personal notes for installation and configuration of
-Amazon's "Open Distro for Elasticsearch" on Fedora 30.
+Amazon's OpenSearch on Fedora.
 
-## Configuring Elasticsearch
+## Configuring ElasticSearch/OpenSearch
 
-In this document it is assumed that Amazon's "Open Distro for Elasticsearch"
-( https://opendistro.github.io/for-elasticsearch/ ) is used. The version
-described is 7.0.1.
+In this document it is assumed that Amazon's "OpenSearch", a fork of
+ElasticSearch, is used. The version described is 1.3.2.
 
 For now it should be run without SSL, so you need to change settings in:
 
@@ -24,7 +23,7 @@ with:
 
     opendistro_security.ssl.http.enabled: false
 
-and restart Elasticsearch
+and restart ElasticSearch/OpenSearch
 
 Please note that this *will* be changed in the future.
 
@@ -53,19 +52,19 @@ and start Kibana.
 Users can be added in Kibana. Log into kibana and create a user. Please note:
 user names are case sensitive!
 
-Also, "Open Distro for Elasticsearch" doesn't like passwords shorter than
-5 characters. In the rest of the document it is assumed that the user is
-'bang' and the password is 'bangbang'.
+Also, OpenSearch doesn't like passwords shorter than 5 characters. In the rest
+of the document it is assumed that the user is `bang` and the password is
+`bangbang`.
 
-The index that will be used for Elasticsearch is 'bang'.
+The index that will be used for ElasticSearch/OpenSearch is `bang`.
 
-## Installing Elasticsearch Python bindings
+## Installing ElasticSearch/OpenSearch Python bindings
 
 Install:
 
     python3-elasticsearch
 
-# Configure BANG to use Elasticsearch
+# Configure BANG to use ElasticSearch/OpenSearch
 
 The file bang.config has a section 'elasticsearch'. In these the following
 should be changed:
@@ -75,3 +74,8 @@ should be changed:
 should be changed to:
 
     elastic_enabled = yes
+
+# References
+
+
+[1] <https://opensearch.org/>
