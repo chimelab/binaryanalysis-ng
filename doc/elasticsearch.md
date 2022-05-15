@@ -77,5 +77,4 @@ should be changed to:
 
 # References
 
-
 [1] <https://opensearch.org/>
