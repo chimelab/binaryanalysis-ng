@@ -1,70 +1,85 @@
 # Configuration of the ElasticSearch/Opensearch reporter in BANG
 
-BANG can write its results to ElasticSearch/OpenSearch and make it available for further
-investigation and processing using standard ElasticSearch/OpenSearch tools.
+BANG can write its results to ElasticSearch/OpenSearch and make it available
+for further investigation and processing using standard
+ElasticSearch/OpenSearch tools.
 
 Note: these are mostly personal notes for installation and configuration of
-Amazon's OpenSearch on Fedora.
+Amazon's OpenSearch on Fedora. The version described is 1.3.2.
 
-## Configuring ElasticSearch/OpenSearch
+In this fork a few components were renamed:
 
-In this document it is assumed that Amazon's "OpenSearch", a fork of
-ElasticSearch, is used. The version described is 1.3.2.
+* ElasticSearch -> OpenSearch
+* Kibana -> OpenSearch Dashboards
+
+## Installing OpenSearch
+
+(Installing OpenSearch and OpenSource Dashboards is outside the scope of this
+document and is described on the OpenSearch website, just a few notes are put
+here.)
+
+Install `opensearch`
+
+## Configuring OpenSearch
 
 For now it should be run without SSL, so you need to change settings in:
 
-    /etc/elasticsearch/elasticsearch.yml
+    /etc/opensearch/opensearch.yml
 
 and replace:
 
-    opendistro_security.ssl.http.enabled: true
+    plugins.security.ssl.http.enabled:: true
 
 with:
 
-    opendistro_security.ssl.http.enabled: false
+    plugins.security.ssl.http.enabled: false
 
-and restart ElasticSearch/OpenSearch
+and restart OpenSearch:
+
+    # systemctl start opensearch.service
 
 Please note that this *will* be changed in the future.
 
-## Install Kibana
+## Install OpenSearch Dashboards
 
-Install opendistroforelasticsearch-kibana
+Install `opensearch-dashboards`
 
 Then edit:
 
-    /etc/kibana/kibana.yml
+    /etc/opensearch-dashboards/opensearch_dashboards.yml
 
 and change:
 
-    elasticsearch.url: https://localhost:9200
+    opensearch.hosts: [https://localhost:9200]
 
 into:
 
-    elasticsearch.hosts: http://localhost:9200
+    opensearch.hosts: [http://localhost:9200]
 
-(note the change from https to http!)
+(note the change from `https` to `http`!)
 
-and start Kibana.
+and start OpenSearch Dashboards:
+
+    # systemctl start opensearch-dashboards.service
 
 ### Creating a user
 
-Users can be added in Kibana. Log into kibana and create a user. Please note:
-user names are case sensitive!
+Users can be added in OpenSearch Dashboards. Please note: user names are case
+sensitive!
 
 Also, OpenSearch doesn't like passwords shorter than 5 characters. In the rest
 of the document it is assumed that the user is `bang` and the password is
 `bangbang`.
 
-The index that will be used for ElasticSearch/OpenSearch is `bang`.
+The index that will be used for OpenSearch is `bang`.
 
-## Installing ElasticSearch/OpenSearch Python bindings
+## Installing OpenSearch Python bindings
 
 Install:
 
     python3-elasticsearch
 
-# Configure BANG to use ElasticSearch/OpenSearch
+# Configure BANG to use OpenSearch
 
 The file bang.config has a section 'elasticsearch'. In these the following
 should be changed:
