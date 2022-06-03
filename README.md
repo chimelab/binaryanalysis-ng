@@ -48,7 +48,7 @@ The recommended way is to use [Nix](https://nixos.org/nix), run
 * ncompress
 * util-linux (for 'fsck.cramfs')
 * lz4 (for 'lz4c')
-* elasticsearch (possibly named python3-elasticsearch)
+* opensearch
 
 and many others (see `shell.nix`, `maintenance.nix` and `analysis.nix` for a
 full list).

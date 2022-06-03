@@ -5,7 +5,7 @@ for further investigation and processing using standard
 OpenSearch tools.
 
 Note: these are mostly personal notes for installation and configuration of
-Amazon's OpenSearch on Fedora. The version described is 1.3.2.
+Amazon's OpenSearch on Fedora. The version described is 2.0.0.
 
 In this fork a few components were renamed:
 
@@ -83,14 +83,14 @@ Install:
 
 # Configure BANG to use OpenSearch
 
-The file bang.config has a section 'elasticsearch'. In these the following
+The file bang.config has a section 'opensearch'. In these the following
 should be changed:
 
-    elastic_enabled = no
+    opensearch_enabled = no
 
 should be changed to:
 
-    elastic_enabled = yes
+    opensearch_enabled = yes
 
 # References
 
