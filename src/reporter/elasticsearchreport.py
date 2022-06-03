@@ -23,12 +23,12 @@
 import copy
 import elasticsearch
 
-class ElasticsearchReporter:
+class OpenSearchReporter:
     def __init__(self, environment):
         self.environment = environment
 
     def report(self, scanresult):
-        '''Put results into Elasticsearch'''
+        '''Put results into OpenSearch'''
         # copy scanresult because json cannot serialize datetime objects by itself
         result = copy.deepcopy(scanresult)
 
@@ -41,47 +41,47 @@ class ElasticsearchReporter:
 
         uuid = result['session']['uuid']
 
-        # first create the Elasticsearch connection string. TODO: sanitize
+        # first create the OpenSearch connection string. TODO: sanitize
         connectionstring = 'http://%s:%s@%s:%d/'
 
-        if self.environment['elastic_port'] is None:
-            elastic_port = 9200
+        if self.environment['opensearch_port'] is None:
+            opensearch_port = 9200
         else:
-            elastic_port = self.environment['elastic_port']
+            opensearch_port = self.environment['opensearch_port']
 
-        if self.environment['elastic_host'] is None:
-            elastic_host = 'localhost'
+        if self.environment['opensearch_host'] is None:
+            opensearch_host = 'localhost'
         else:
-            elastic_host = self.environment['elastic_host']
+            opensearch_host = self.environment['opensearch_host']
 
-        if self.environment['elastic_index'] is None:
-            elastic_index = ''
+        if self.environment['opensearch_index'] is None:
+            opensearch_index = ''
         else:
-            elastic_index = self.environment['elastic_index']
+            opensearch_index = self.environment['opensearch_index']
 
-        if self.environment['elastic_user'] is None:
-            elastic_user = ''
+        if self.environment['opensearch_user'] is None:
+            opensearch_user = ''
         else:
-            elastic_user = self.environment['elastic_user']
+            opensearch_user = self.environment['opensearch_user']
 
-        if self.environment['elastic_password'] is None:
-            elastic_password = ''
+        if self.environment['opensearch_password'] is None:
+            opensearch_password = ''
         else:
-            elastic_password = self.environment['elastic_password']
+            opensearch_password = self.environment['opensearch_password']
 
-        connectionstring = connectionstring % (elastic_user, elastic_password, elastic_host, elastic_port)
+        connectionstring = connectionstring % (opensearch_user, opensearch_password, opensearch_host, opensearch_port)
 
-        es = elasticsearch.Elasticsearch([connectionstring])
+        es = elasticsearch.OpenSearch([connectionstring])
 
         # store some information about the session
-        es.index(index=elastic_index, doc_type='_doc', body=result['session'])
+        es.index(index=opensearch_index, doc_type='_doc', body=result['session'])
 
         # store information about the individual nodes.
         # TODO: use the bulk interface for this
         for scannode in result['scantree']:
             scannode_res = result['scantree'][scannode]
             scannode_res['uuid'] = uuid
-            es.index(index=elastic_index, doc_type='_doc', body=scannode_res)
+            es.index(index=opensearch_index, doc_type='_doc', body=scannode_res)
 
     def update(self, scanresult):
         pass

@@ -61,13 +61,13 @@ class BangOptions():
             'postgresql_db': None,
             'usedatabase': True,
             'postgresql_error_fatal': False,
-            'elastic_enabled': False,
-            'elastic_user': None,
-            'elastic_password': None,
-            'elastic_index': None,
-            'elastic_connectionerrorfatal': False,
-            'elastic_port': None,
-            'elastic_host': None,
+            'opensearch_enabled': False,
+            'opensearch_user': None,
+            'opensearch_password': None,
+            'opensearch_index': None,
+            'opensearch_connectionerrorfatal': False,
+            'opensearch_port': None,
+            'opensearch_host': None,
             'writereport': True,
             'uselogging': True,
             'bangthreads': multiprocessing.cpu_count(),
@@ -208,15 +208,15 @@ class BangOptions():
         self._set_string_option_from_config('postgresql_db', section='database')
         self._set_string_option_from_config('postgresql_host', section='database')
         self._set_integer_option_from_config('postgresql_port', section='database')
-        self._set_boolean_option_from_config('elastic_enabled',
-                section='elasticsearch', option='elastic_enabled')
-        self._set_string_option_from_config('elastic_user', section='elasticsearch')
-        self._set_string_option_from_config('elastic_password', section='elasticsearch')
-        self._set_string_option_from_config('elastic_index', section='elasticsearch')
-        self._set_boolean_option_from_config('elastic_connectionerrorfatal',
-                section='elasticsearch')
-        self._set_string_option_from_config('elastic_host', section='elasticsearch')
-        self._set_integer_option_from_config('elastic_port', section='elasticsearchs')
+        self._set_boolean_option_from_config('opensearch_enabled',
+                section='opensearchsearch', option='opensearch_enabled')
+        self._set_string_option_from_config('opensearch_user', section='opensearchsearch')
+        self._set_string_option_from_config('opensearch_password', section='opensearchsearch')
+        self._set_string_option_from_config('opensearch_index', section='opensearchsearch')
+        self._set_boolean_option_from_config('opensearch_connectionerrorfatal',
+                section='opensearchsearch')
+        self._set_string_option_from_config('opensearch_host', section='opensearchsearch')
+        self._set_integer_option_from_config('opensearch_port', section='opensearchsearchs')
 
     def _set_options_from_arguments(self):
         self.options.checkpath = self.args.checkpath
