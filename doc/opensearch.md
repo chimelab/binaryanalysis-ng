@@ -1,8 +1,8 @@
-# Configuration of the ElasticSearch/Opensearch reporter in BANG
+# Configuration of the OpenSearch reporter in BANG
 
-BANG can write its results to ElasticSearch/OpenSearch and make it available
+BANG can write its results to OpenSearch and make it available
 for further investigation and processing using standard
-ElasticSearch/OpenSearch tools.
+OpenSearch tools.
 
 Note: these are mostly personal notes for installation and configuration of
 Amazon's OpenSearch on Fedora. The version described is 1.3.2.
@@ -11,6 +11,8 @@ In this fork a few components were renamed:
 
 * ElasticSearch -> OpenSearch
 * Kibana -> OpenSearch Dashboards
+
+It could be that ElasticSearch will work as well, but this hasn't been tested.
 
 ## Installing OpenSearch
 
