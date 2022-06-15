@@ -20,7 +20,8 @@ It could be that ElasticSearch will work as well, but this hasn't been tested.
 document and is described on the OpenSearch website, just a few notes are put
 here.)
 
-Install `opensearch`
+Currently `opensearch` is not available in Nixpkgs so install it via the
+methods described on the OpenSearch website.
 
 ## Configuring OpenSearch
 
@@ -38,7 +39,9 @@ with:
 
 and restart OpenSearch:
 
-    # systemctl start opensearch.service
+```console
+# systemctl start opensearch.service
+```
 
 Please note that this *will* be changed in the future.
 
@@ -62,7 +65,9 @@ into:
 
 and start OpenSearch Dashboards:
 
-    # systemctl start opensearch-dashboards.service
+```console
+# systemctl start opensearch-dashboards.service
+```
 
 ### Creating a user
 
@@ -77,9 +82,12 @@ The index that will be used for OpenSearch is `bang`.
 
 ## Installing OpenSearch Python bindings
 
-Install:
+Currently the OpenSearch Python bindings are not available in Nixpkgs, so have
+to be installed separately:
 
-    python3-elasticsearch
+```console
+$ pip install opensearch-py
+```
 
 # Configure BANG to use OpenSearch
 
