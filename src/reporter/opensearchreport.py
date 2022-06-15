@@ -25,7 +25,7 @@ Write results to an instance of OpenSearch.
 '''
 
 import copy
-import elasticsearch
+import opensearchpy
 
 
 class OpenSearchReporter:
