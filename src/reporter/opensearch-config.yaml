@@ -1,0 +1,31 @@
+---
+opensearch:
+    # The user as which to connect to OpenSearch, in case
+    # security is used
+    opensearch_user: bang
+
+    # The password to use to connect to OpenSearch, in case
+    # security is used
+    opensearch_password: bangbang
+
+    # The index to use
+    opensearch_index: bang
+
+    # Flag to indicate whether OpenSearch connection errors
+    # should be treated as fatal (i.e. program should stop).
+    #
+    # The default mode is to continue without having OpenSearch and
+    # to just disable the functionality that requires OpenSearch, but
+    # this makes it harder to detect that OpenSearch might be down.
+    # Users who depend on using OpenSearch should set this to
+    # 'true' instead of 'false'.
+    #opensearch_connectionerrorfatal: true
+
+    # The host for the OpenSearch server.
+    #opensearch_host: 127.0.0.1
+
+    # The port for the OpenSearch server. No need to set this
+    # if you are using the default. If you are
+    # running OpenSearch on another port you need to
+    # change this
+    #opensearch_port: 9200
